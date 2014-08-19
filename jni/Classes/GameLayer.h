@@ -21,22 +21,19 @@ public:
 		ORDER_POP,
 	};
 
-	enum GameRunState
-	{
-		GRS_UNKNOWN,
-		GRS_PAUSE,
-		GRS_PLAY,
-		GRS_TOUCH_OVER,
-		GRS_FINISH_ANSWER,
-		GRS_LEVELUP,
-		GRS_OVER
-	};
+	/*ç´¯è®¡ç­”å¯¹å¤šå°‘é¢˜è¿‡å…³*/
+//	enum LEVEL_UP
+//	{
+//		LEVEL_ONE = 2,
+//		LEVEL_TWO = 5,
+//		LEVEL_THREE = 8,
+//		LEVEL_FOUR = 12,
+//	};
 
-	/*ÀÛ¼Æ´ð¶Ô¶àÉÙÌâ¹ý¹Ø*/
 	enum LEVEL_UP
 	{
-		LEVEL_ONE = 2,
-		LEVEL_TWO = 7,
+		LEVEL_ONE = 20,
+		LEVEL_TWO = 70,
 		LEVEL_THREE = 170,
 		LEVEL_FOUR = 370,
 	};
@@ -49,7 +46,7 @@ public:
 	void initMonster();
 	void initQuestion();
 	void initProgress();
-	void ansRight();//»Ø´ðÕýÈ·
+	void ansRight();//å›žç­”æ­£ç¡®
 
 	CREATE_FUNC(GameLayer);
 
@@ -72,6 +69,7 @@ public:
 	void onPauseClick(CCObject *pSender);
 	void onCardClick(CCObject *pSender);
 	void buttonCallback(CCNode *pNode);
+
 	void playSpeedUpAnim();
 	void animFinish();
 
@@ -84,7 +82,7 @@ public:
 	void dobuleScoreCard();
 	bool isLevelUp();
 	void levelUpDone();
-	void gameOver(bool param1);
+	void gameOver(bool isPassAll);
 	void exitGame();
 	void addScore();
 	void handleTimeOver();
@@ -96,7 +94,6 @@ private:
 	bool isAnsRight;
 	bool isShowAnswerAfterWrong;
 	int doubleScoreCount;
-	int gameState;
 	int gameLevel;
 	float timeMax;
 	float timeRemain;

@@ -4,7 +4,7 @@ GameControl g_Control;
 
 GameControl::GameControl() :
 	m_bSound(true),
-
+	isInit(false),
 	m_nRight(0),
 	m_nWrong(0),
 	m_nScore(0),
@@ -12,20 +12,22 @@ GameControl::GameControl() :
 	m_nCoin(0),
 	m_fSpeedGain(1)
 {
-	setSRand();
-	initResource();
+	//initResource();
 };
 
 GameControl::~GameControl()
 {
+	delete dataControl;
 }
 
 void GameControl::initResource(void)
 {
+	CCLog("init_____________");
+	setSRand();
 	m_Resource.insert(map<string, void*>::value_type("HudLayer", (void *)(&HudResources)));
 	m_Resource.insert(map<string, void*>::value_type("Hero", (void *)(&HeroImages)));
 	m_Resource.insert(map<string, void*>::value_type("Monster", (void *)(&MonsterImgs)));
-	//m_Resource.insert(map<string, void*>::value_type("GameMusic", (void *)(&GameMusic)));
+	dataControl = new DataControl();
 }
 
 void GameControl::setSRand(void)
@@ -36,48 +38,12 @@ void GameControl::setSRand(void)
 	srand(rand_seed);
 }
 
-void GameControl::playBGMusic(OCMusicID index)
+void GameControl::playBGMusic(const char* pszFilePath)
 {
-	GameControl::OCMusicResource *pMusicRes = (GameControl::OCMusicResource *)(g_Control.m_Resource["GameMusic"]);
-	if (m_bSound && (NULL != pMusicRes))
+	if (m_bSound)
 	{
-		switch (index)
-		{
-		case MIDBG_MUSIC_A:
-			if (!SimpleAudioEngine::sharedEngine()->isBackgroundMusicPlaying())
-			{
-				SimpleAudioEngine::sharedEngine()->playBackgroundMusic(pMusicRes->m_strBGMusicA.c_str(), true);
-			}
-			break;
-
-		case MIDBG_MUSIC_B1:
-			SimpleAudioEngine::sharedEngine()->stopBackgroundMusic();
-			SimpleAudioEngine::sharedEngine()->playBackgroundMusic(pMusicRes->m_strBGMusicB1.c_str(), true);
-			break;
-
-		case MIDBG_MUSIC_B2:
-			SimpleAudioEngine::sharedEngine()->stopBackgroundMusic();
-			SimpleAudioEngine::sharedEngine()->playBackgroundMusic(pMusicRes->m_strBGMusicB2.c_str(), true);
-			break;
-
-		case MIDBG_MUSIC_B3:
-			SimpleAudioEngine::sharedEngine()->stopBackgroundMusic();
-			SimpleAudioEngine::sharedEngine()->playBackgroundMusic(pMusicRes->m_strBGMusicB3.c_str(), true);
-			break;
-
-		case MIDBG_MUSIC_C:
-			SimpleAudioEngine::sharedEngine()->stopBackgroundMusic();
-			SimpleAudioEngine::sharedEngine()->playBackgroundMusic(pMusicRes->m_strBGMusicC.c_str(), true);
-			break;
-
-		case MIDCOUNT_DOWN:
-			SimpleAudioEngine::sharedEngine()->stopBackgroundMusic();
-			SimpleAudioEngine::sharedEngine()->playBackgroundMusic(pMusicRes->m_strCountDown.c_str(), false);
-			break;
-
-		default:
-			break;
-		}
+		SimpleAudioEngine::sharedEngine()->stopBackgroundMusic();
+		SimpleAudioEngine::sharedEngine()->playBackgroundMusic(pszFilePath, true);
 	}
 }
 
@@ -89,100 +55,11 @@ void GameControl::stopBGMusic(void)
 	}
 }
 
-void GameControl::playEffect(OCMusicID index)
+void GameControl::playEffect(const char* pszFilePath)
 {
-	GameControl::OCMusicResource *pMusicRes = (GameControl::OCMusicResource *)(g_Control.m_Resource["GameMusic"]);
-	if (m_bSound && (NULL != pMusicRes))
+	if (m_bSound)
 	{
-		switch (index)
-		{
-		case MIDBUTTON:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strButton.c_str());
-			break;
-
-		case MIDTIME_PLUS:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strTimePlus.c_str());
-			break;
-
-		case MIDLEVEL_UP:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strLevelUp.c_str());
-			break;
-
-		case MID_FIRST_BLOOD:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strFirstBlood.c_str());
-			break;
-
-		case MID_BUTCHER:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strButcher.c_str());
-			break;
-		default:
-			break;
-		}
-	}
-}
-
-void GameControl::playEffect(int index)
-{
-	GameControl::OCMusicResource *pMusicRes = (GameControl::OCMusicResource *)(g_Control.m_Resource["GameMusic"]);
-	if (m_bSound && (NULL != pMusicRes))
-	{
-		switch (index)
-		{
-		case MID_DOBULE_KILL:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strDobule_kill.c_str());
-			break;
-
-		case MID_TRIPLE_KILL:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strTriple_kill.c_str());
-			break;
-
-		case MID_ULTRA_KILL:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strUltra_kill.c_str());
-			break;
-
-		case MID_RAMPAGE:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strRampage.c_str());
-			break;
-
-		case MID_KILLING_SPREE:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strKillingSpree.c_str());
-			break;
-
-		case MID_DOMINATING:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strDominating.c_str());
-			break;
-
-		case MID_MEGA_KILL:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strMegaKill.c_str());
-			break;
-
-		case MID_UNSTOPPABLE:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strUnstoppable.c_str());
-			break;
-
-		case MID_WICHEDSICK:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strWichedSick.c_str());
-			break;
-
-		case MID_MONSTERKILL:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strMonsterKill.c_str());
-			break;
-
-		case MID_GODLIKE:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strGodlike.c_str());
-			break;
-
-		case MID_HOLYSHIT:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strHolyShit.c_str());
-			break;
-
-		case MID_OWNING:
-			SimpleAudioEngine::sharedEngine()->playEffect(pMusicRes->m_strOwning.c_str());
-			break;
-
-		default:
-			break;
-		}
+		SimpleAudioEngine::sharedEngine()->playEffect(pszFilePath);
 	}
 }
 
@@ -219,7 +96,6 @@ bool GameControl::save(void)
 
 bool GameControl::load(void)
 {
-	CCLog("________load_________");
 	m_nCoin = CCUserDefault::sharedUserDefault()->getIntegerForKey(s_keyCoin);
 
 	for (int n = 0; n < CARD_COUNT; n++)
@@ -228,7 +104,6 @@ bool GameControl::load(void)
 		sprintf(key, s_keyCard, n);
 		cards[n] = CCUserDefault::sharedUserDefault()->getIntegerForKey(key);
 	}
-	CCLog("________load_________44444444");
 
 	return true;
 }

@@ -62,10 +62,12 @@ public class TurboSnail extends Cocos2dxActivity{
 
 					@Override
 					public void onSuccess(InfoRanking data) {
-						int rank = Integer.parseInt(data.getRankNumber());
-						int score = Integer.parseInt(data.getTotalScore());
-						System.out.println(rank + "________onSuccess_________" + score);
-						setRank(rank,score);						
+						if(null != data){
+							int rank = Integer.parseInt(data.getRankNumber());
+							int score = Integer.parseInt(data.getTotalScore());
+							System.out.println(rank + "________onSuccess_________" + score);
+							setRank(rank,score);						
+						}
 					}
 
 					@Override

@@ -94,6 +94,7 @@ void MarketScene::initButton()
 
 void MarketScene::buttonCallback(CCNode *pNode)
 {
+	g_Control.playEffect(s_effectButton);
 	switch (pNode->getTag())
 	{
 	case BTN_BUY:
@@ -209,6 +210,7 @@ void MarketScene::buyCard(CCNode * pNode)
 	int price = getPrice(selectedIndex);
 	if (g_Control.m_nCoin >= price)
 	{
+		g_Control.playEffect(s_effectBuy);
 		CCMenuItemImage *pItem = (CCMenuItemImage *)pNode;
 		pItem->setEnabled(false);
 

@@ -22,34 +22,6 @@ using namespace std;
 class GameControl
 {
 public:
-	struct OCMusicResource
-	{
-		string m_strBGMusicA;
-		string m_strBGMusicB1;
-		string m_strBGMusicB2;
-		string m_strBGMusicB3;
-		string m_strBGMusicC;
-		string m_strButton;
-		string m_strCountDown;
-		string m_strTimePlus;
-		string m_strLevelUp;
-		string m_strFirstBlood;
-		string m_strDobule_kill; 
-		string m_strTriple_kill;
-		string m_strUltra_kill;
-		string m_strRampage;
-		string m_strKillingSpree;
-		string m_strDominating;
-		string m_strMegaKill;
-		string m_strUnstoppable;
-		string m_strWichedSick;
-		string m_strMonsterKill;
-		string m_strGodlike;
-		string m_strHolyShit;
-		string m_strOwning;
-		string m_strButcher;
-	};
-	
 	struct CARD
 	{
 		int card_change;
@@ -58,34 +30,6 @@ public:
 		int card_speed_up;
 		int card_ans;
 		int card_double;
-	};
-public:
-	enum OCMusicID
-	{
-		MIDBG_MUSIC_A,
-		MIDBG_MUSIC_B1,
-		MIDBG_MUSIC_B2,
-		MIDBG_MUSIC_B3,
-		MIDBG_MUSIC_C,
-		MIDBUTTON,
-		MIDCOUNT_DOWN,
-		MIDTIME_PLUS,
-		MIDLEVEL_UP,
-		MID_FIRST_BLOOD,
-		MID_DOBULE_KILL,
-		MID_TRIPLE_KILL, 
-		MID_ULTRA_KILL,
-		MID_RAMPAGE,
-		MID_KILLING_SPREE,
-		MID_DOMINATING,
-		MID_MEGA_KILL,
-		MID_UNSTOPPABLE,
-		MID_WICHEDSICK,
-		MID_MONSTERKILL,
-		MID_GODLIKE,
-		MID_HOLYSHIT,
-		MID_OWNING,
-		MID_BUTCHER,
 	};
 
 public:
@@ -98,10 +42,9 @@ public:
 	void setSRand(void);
 	void reset();
 
-	void playBGMusic(OCMusicID index);
+	void playBGMusic(const char* pszFilePath);
 	void stopBGMusic(void);
-	void playEffect(OCMusicID index);
-	void playEffect(int index);
+	void playEffect(const char* pszFilePath);
 
 	//远近中景层移动速度
 	CC_SYNTHESIZE(float, m_fSkyVelocity, SkyVelocity);
@@ -111,7 +54,9 @@ public:
 	CCLabelAtlas * creatLabelAtlas(int number, const LabelAtlasData s_pNumTitleScore, CCNode *parent, int tag = 0);
 public:
 	map<string, void *> m_Resource;
+	int gameState;
 
+	bool isInit;
 	bool m_bSound;
 
 	int m_nRight;
@@ -125,6 +70,8 @@ public:
 	float m_fSpeedGain;
 
 	int cards[CARD_COUNT];
+
+	DataControl *dataControl;
 };
 
 extern GameControl g_Control;

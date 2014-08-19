@@ -2,7 +2,7 @@
 
 USING_NS_CC;
 
-StartScene::StartScene()
+StartScene::StartScene() 
 {
 }
 
@@ -16,17 +16,20 @@ bool StartScene::init()
 	do 
 	{
 		CC_BREAK_IF(!CCScene::init());
+		g_Control.playBGMusic(s_musicBgMain);
+		//initProgress();
 		initBackground();
 		initButton();
-		scheduleUpdate();
+
+		if (!g_Control.isInit)
+		{
+			this->scheduleOnce(schedule_selector(StartScene::initResources), 0);
+		}
+		isTouchEnable = true;
 		bRet = true;
 	} while (0);
 
 	return bRet;
-}
-
-void StartScene::update(float delta)
-{
 }
 
 void StartScene::initBackground()
@@ -62,6 +65,10 @@ void StartScene::initButton()
 	pSound->setAnchorPoint(ccp(0, 1));
 	pSound->setPosition(ccp(0, SCREEN.height));
 	pSound->setTag(BTN_SOUND);
+	if (!g_Control.m_bSound)
+	{
+		pSound->setSelectedIndex(1);
+	}
 	pMenu->addChild(pSound);
 
 	pMenuItem = CCMenuItemImage::create(s_pMenuItemMarket.charMapFile, s_pMenuItemMarket.charMapFilePress, this, menu_selector(StartScene::buttonCallback));
@@ -85,11 +92,18 @@ void StartScene::initButton()
 
 void StartScene::buttonCallback(CCNode *pNode)
 {
-	CCLog("          call back  = %d  ", pNode->getTag());
+	if (!g_Control.isInit || !isTouchEnable)
+	{
+		return;
+	}
+	
+	g_Control.playEffect(s_effectButton);
+
 	switch (pNode->getTag())
 	{
 	case BTN_START:
 	{
+		isTouchEnable = false;
 		CCDirector::sharedDirector()->replaceScene(GameScene::create());
 	}
 		break;
@@ -132,4 +146,105 @@ void StartScene::exit(void)
 	exit(0);
 #endif
 #endif
+}
+
+void StartScene::initResources(float t)
+{
+	g_Control.initResource();
+
+	char szFileName[32] = { 0 };
+	for (int i = 0; i < 8; i++)
+	{
+		for (int k = 0; k < MonsterImgs.monster_idle.m_frameCount; k++)
+		{
+			sprintf(szFileName, MonsterImgs.monster_idle.m_strPath.c_str(), i, k);
+			CCTextureCache::sharedTextureCache()->addImageAsync(szFileName, NULL, NULL);
+			sprintf(szFileName, MonsterImgs.monster_defy.m_strPath.c_str(), i, k);
+			CCTextureCache::sharedTextureCache()->addImageAsync(szFileName, NULL, NULL);
+		}
+	}
+
+	for (int i = 1; i <= 5;i++)
+	{
+		for (int k = 0; k < HeroImages.hero_speed.m_frameCount; k++)
+		{
+			sprintf(szFileName, HeroImages.hero_speed.m_strPath.c_str(), i, k);
+			CCTextureCache::sharedTextureCache()->addImageAsync(szFileName, NULL, NULL);
+		}
+	}
+
+	for (int k = 0; k < HeroImages.hero_hit.m_frameCount; k++)
+	{
+		sprintf(szFileName, HeroImages.hero_hit.m_strPath.c_str(), k);
+		CCTextureCache::sharedTextureCache()->addImageAsync(szFileName, NULL, NULL);
+		sprintf(szFileName, HeroImages.hero_hit.m_strPath.c_str(), k);
+		CCTextureCache::sharedTextureCache()->addImageAsync(szFileName, NULL, NULL);
+	}
+
+	for (int i = 0; i < CARD_COUNT; i++)
+	{
+		sprintf(szFileName, s_pathCard.charMapFile, i);
+		CCTextureCache::sharedTextureCache()->addImageAsync(szFileName, NULL, NULL);
+		sprintf(szFileName, s_pathCard.charMapFilePress, i);
+		CCTextureCache::sharedTextureCache()->addImageAsync(szFileName, NULL, NULL);
+		sprintf(szFileName, s_pathCardDisable, i);
+		CCTextureCache::sharedTextureCache()->addImageAsync(szFileName, NULL, NULL);
+	}
+	
+	CCTextureCache::sharedTextureCache()->addImageAsync(s_pBgQuestion.m_strPath, NULL, NULL);
+	CCTextureCache::sharedTextureCache()->addImageAsync(s_pBgQuestion.m_strPath, NULL, NULL);
+	CCTextureCache::sharedTextureCache()->addImageAsync(s_pPathProgressEmpy, NULL, NULL);
+	CCTextureCache::sharedTextureCache()->addImageAsync(s_pPathProgressFull, NULL, NULL);
+
+	SimpleAudioEngine::sharedEngine()->preloadEffect(s_effectAnswer);
+	SimpleAudioEngine::sharedEngine()->preloadEffect(s_effectEat);
+	SimpleAudioEngine::sharedEngine()->preloadEffect(s_effectHit);
+	SimpleAudioEngine::sharedEngine()->preloadEffect(s_effectUseItem);
+
+	for (int k = 0; k < s_pGamePass.m_frameCount; k++)
+	{
+		char szFileName[32] = { 0 };
+		sprintf(szFileName, s_pGamePass.m_strPath.c_str(), k);
+		CCTextureCache::sharedTextureCache()->addImageAsync(szFileName, NULL, NULL);
+	}
+
+	//updateProgress(100);
+	g_Control.isInit = true;
+	CCLog("init_____________over");
+}
+
+void StartScene::initProgress()
+{
+	if (g_Control.isInit)
+	{
+		return;
+	}
+
+	CCLayerColor *layer = CCLayerColor::create(ccc4(25, 25, 25, 125));
+	this->addChild(layer, TAG_PROGRESS, TAG_PROGRESS);
+
+	//½ø¶È±³¾°
+	CCSprite *sprite = CCSprite::create(s_pLoadProgressBg);
+	sprite->setPosition(CENTER);
+	addChild(sprite, TAG_PROGRESS, TAG_PROGRESS);
+
+	progress = CCProgressTimer::create(CCSprite::create(s_pLoadProgressFull));
+	progress->setType(kCCProgressTimerTypeBar);
+	progress->setMidpoint(ccp(0, 0));
+	progress->setBarChangeRate(ccp(1, 0));
+	addChild(progress, TAG_PROGRESS, TAG_PROGRESS);
+	progress->setPosition(CENTER);
+}
+
+void StartScene::loadComplete()
+{
+	removeChildByTag(TAG_PROGRESS, true);
+	removeChildByTag(TAG_PROGRESS, true);
+	removeChildByTag(TAG_PROGRESS, true);
+}
+
+void StartScene::updateProgress(int pre)
+{
+	CCProgressTo *to = CCProgressTo::create(1.0f, pre);
+	progress->runAction(CCSequence::create(to, CCCallFunc::create(this, callfunc_selector(StartScene::loadComplete)), NULL));
 }

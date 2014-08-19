@@ -28,13 +28,6 @@ void Monster::setMonsterType(int type)
 
 	animation = AnimationUtils::createAnimationWithSpriteFrames(p->monster_defy, monsterType);
 	this->setDefyAction(CCRepeatForever::create(CCAnimate::create(animation)));
-	//CCFiniteTimeAction *actionOne = CCSequence::create(
-	//	CCAnimate::create(animation),
-	//	CCMoveTo::create(0.8f, ccp(150, 350)),
-	//	CCCallFunc::create(this, callfunc_selector(Monster::actionFinishToHide)),
-	//	NULL
-	//	);
-	//this->setDefyAction(actionOne);
 
 	option = CCSprite::create(s_pPathBgOption);
 	option->setPosition(ccp(getContentSize().width * 0.5f + 20, getContentSize().height + 20));

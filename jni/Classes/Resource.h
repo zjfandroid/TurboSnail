@@ -1,58 +1,9 @@
-#ifndef _RESOURCE_H_
+﻿#ifndef _RESOURCE_H_
 #define _RESOURCE_H_
 
 #include "HudLayer.h"
 #include "Hero.h"
 #include "Monster.h"
-
-enum NUM
-{
-	CARD_COUNT = 6,//������
-	CARD_INFO = 99,
-	BTN_CARD = 100,
-
-	BTN_CLOSE = 200,
-	BTN_SURE,
-	BTN_CANCLE,
-	BTN_BUY,
-
-	LabelAtlas_SCORE,
-	LabelAtlas_TIME,
-	LabelAtlas_COIN,
-	LabelAtlas_PRICE,
-
-	TAG_QUESTION_TITLE = 800,
-	TAG_QUESTION_ANS,
-	TAG_RIGHT_ANS,
-	TAG_WRONG_ANS,
-	TAG_CARD_BUY,
-
-	TAG_DARK_BG = 900,
-	TAG_COUNTDOWN,
-	TAG_MENU,
-};
-
-struct ImageData
-{
-	const char *m_strPath;
-	CCPoint m_Position;
-};
-
-struct LabelAtlasData
-{
-	const char *charMapFile;
-	int itemWidth;
-	int itemHeight;
-	int startCharMap;
-	CCPoint m_Position;
-};
-
-struct MenuItemData
-{
-	const char *charMapFile; 
-	const char *charMapFilePress;
-	CCPoint m_Position;
-};
 
 const HudLayer::Res HudResources =
 {
@@ -81,38 +32,42 @@ static const char s_pBgHelpBoard[] = "image/board_help.png";
 static const char s_pBgMarketBoard[] = "image/board_market.png";
 static const char s_pCountDown[] = "image/%02d.png";
 static const char s_pLevelUp[] = "image/level_up.png";
+static const char s_pBgGameOver[] = "image/bg_over.jpg";
 static const char s_pGameOver[] = "image/game_over.png";
+static const char s_pGameOverShadow[] = "image/game_over_shadow.png";
 static const char s_pBuyDisable[] = "image/btn_buy_disable.png";
+static const char s_pLoadProgressBg[] = "image/loading_progress_bg.png";
+static const char s_pLoadProgressFull[] = "image/loading_progress_full.png";
 
-//��ҳ
+//首页
 static const ImageData s_pBgLogo = { "image/logo.png", ccp(640, 527.5f) }; 
 
-//������
-static const ImageData s_pBgTitle = { "image/bg_title.png", ccp(640, 727.5f) }; 
+//标题栏
+static const ImageData s_pBgTitle = { "image/bg_title.png", ccp(640, 732.0f) }; 
 
-//�ٶȽ�����
+//速度进度条
 static const char s_pPathProgressEmpy[] = "image/progress_empy.png"; 
 static const char s_pPathProgressFull[] = "image/progress_full.png"; 
 static const CCPoint &s_pPointProgress = ccp(948, 63.5f);
 
-//ʱ�������
+//时间进度条
 static const char s_pTimeProgressFull[] = "image/progress_time_full.png";
-static const CCPoint &s_pPointTimeProgress = ccp(649.5f, 725.2f);
+static const CCPoint &s_pPointTimeProgress = ccp(649.5f, 729.7f);
 
-//��Ŀ
+//题目
 static const ImageData s_pBgQuestion = { "image/bg_question.png", ccp(280, 570) };
 static const ccColor3B& COLOR_QUESTION = ccc3(255, 255, 255);
-static const int SIZE_QUESTION_TXT = 80;//��Ŀ�����С
+static const int SIZE_QUESTION_TXT = 80;//题目字体大小
 
-//ѡ��
+//选项
 static const char s_pPathBgOption[] = "image/bg_option.png"; 
 static const ccColor3B& COLOR_OPTION = ccc3(0, 0, 0);
-static const int SIZE_OPTION_TXT = 63;//ѡ�������С
+static const int SIZE_OPTION_TXT = 63;//选项字体大小
 
-//����
-static const LabelAtlasData s_pNumTitleScore = { "image/num_title_score.png", 40, 40, '0', ccp(343, 708) };
+//数字
+static const LabelAtlasData s_pNumTitleScore = { "image/num_title_score.png", 40, 40, '0', ccp(343, 712) };
 static const LabelAtlasData s_pNumTitleTime = { "image/num_title_time.png", 60, 60, '0', ccp(590, 700) };
-static const LabelAtlasData s_pNumTitleCoin = { "image/num_title_coin.png", 26, 26, '0', ccp(865, 718) };
+static const LabelAtlasData s_pNumTitleCoin = { "image/num_title_coin.png", 26, 26, '0', ccp(865, 720) };
 
 static const ImageData s_pathTomato = { "image/tomato.png", ccp(820, 611) };
 static const LabelAtlasData s_pNumScoreCoin = { "image/num_score_coin.png", 27, 27, '0', ccp(845, 601) }; 
@@ -123,7 +78,7 @@ static const LabelAtlasData s_pNumScoreBlue = { "image/num_score_blue.png", 46, 
 static const ImageData s_pathMarketTomato = { "image/tomato.png", ccp(820, 626) };
 static const LabelAtlasData s_pNumMarketCoin = { "image/num_score_coin.png", 27, 27, '0', ccp(845, 616) };
 
-//��ť
+//按钮
 static const MenuItemData s_pMenuItemStart = { "image/btn_start.png", "image/btn_start_press.png",};
 static const MenuItemData s_pMenuItemHelp = { "image/btn_help.png", "image/btn_help_press.png",};
 static const MenuItemData s_pMenuItemMarket = { "image/btn_market.png", "image/btn_market_press.png",};
@@ -139,29 +94,47 @@ static const MenuItemData s_pMenuItemBack = { "image/btn_back.png", "image/btn_b
 static const MenuItemData s_pMenuItemHelpStart = { "image/btn_help_start.png", "image/btn_help_start_press.png", };
 static const MenuItemData s_pMenuItemBuy = { "image/btn_buy.png", "image/btn_buy_press.png", };
 
-//���� 
+//道具 
 static const MenuItemData s_pathCard = { "image/card_%02d.png", "image/card_%02d_press.png", ccp(340, 535) };
 static const char s_pathCardDisable[] = "image/card_%02d_disable.png";
 static const ImageData s_pathCardbuy = { "image/card_buy.png", ccp(100, 40) };
 static const ImageData s_pathCardInfo = { "image/card_%02d_info.png", ccp(640, 300) };
 
 static const AnimationUtils::AnimationData hero_speed_up = { "anim/hero_speedup_%02d.png", ccp(350, 400), 10, CCRectMake(0, 0, 700, 300), 1.0f / 12.0f, };
+//通关动画
+static const AnimationUtils::AnimationData s_pGamePass = { "pass/game_pass_%02d.png", ccp(640, 400), 61, CCRectMake(0, 0, 1280, 800), 1.0f / 12.0f, };
 
-//��Ϸ����
+//游戏帮助
 static const AnimationUtils::AnimationData help_anim = { "help/help_%02d.png", ccp(640, 470), 80, CCRectMake(0, 0, 380, 240), 1.0f / 12.0f, };
 
-//������ʾ��
+//弹出提示框
 static const char *g_pExitTips[] =
 {
-	"image/board_exit_tips.png",		//������ܰ��ʾ����
-	"image/btn_sure.png",			//ȷ��
+	"image/board_exit_tips.png",		//弹出温馨提示背景
+	"image/btn_sure.png",			//确定
 	"image/btn_sure_press.png",
-	"image/btn_cancle.png",		//ȡ��
+	"image/btn_cancle.png",		//取消
 	"image/btn_cancle_press.png",
 };
 
 static const char s_keySore[] = "score"; 
 static const char s_keyCoin[] = "coin"; 
 static const char s_keyCard[] = "card_%d";
+
+//音乐音效
+static const char s_musicBgMain[] = "music/bg_music_main.mp3";//游戏首页
+static const char s_musicBgGame[] = "music/bg_music_game.mp3";//游戏操作界面
+static const char s_musicBgGameOver[] = "music/bg_music_gameover.mp3";//游戏结束界面
+static const char s_effectCountDown[] = "music/effect_count_down.mp3";//倒计时音效（3-2-1 GO！）
+static const char s_effectUseItem[] = "music/effect_use_item.mp3";//使用道具蜗牛加速动画
+static const char s_effectEat[] = "music/effect_eat.mp3";//游戏操作界面-答对吃掉番茄_怪物
+static const char s_effectHit[] = "music/effect_hit.mp3";//游戏操作界面-答错撞到减速
+static const char s_effectAnswer[] = "music/effect_answer.mp3";//游戏操作界面-点击答案答案消失
+static const char s_effectLevelUp[] = "music/effect_level_up.mp3";//过关升级了
+static const char s_effectTimeLess[] = "music/effect_time_less.mp3";//游戏操作界面-时间快到了
+static const char s_effectGameOver[] = "music/effect_game_over.mp3";//game over
+static const char s_effectGamePass[] = "music/effect_game_pass.mp3";//游戏结束界面-恭喜过关界面
+static const char s_effectBuy[] = "music/effect_buy.mp3";//购买道具界面-购买道具成功道具上面打了个勾
+static const char s_effectButton[] = "music/button.mp3";
 
 #endif

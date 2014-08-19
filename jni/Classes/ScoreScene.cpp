@@ -16,6 +16,8 @@ bool ScoreScene::init()
 	do 
 	{
 		CC_BREAK_IF(!CCScene::init());
+		g_Control.playBGMusic(s_musicBgGameOver);
+
 		initBackground();
 		initButton();
 		initLabelAtlas();
@@ -80,6 +82,8 @@ void ScoreScene::initButton()
 
 void ScoreScene::buttonCallback(CCNode *pNode)
 {
+	g_Control.playEffect(s_effectButton);
+
 	switch (pNode->getTag())
 	{
 	case BTN_RESTART:

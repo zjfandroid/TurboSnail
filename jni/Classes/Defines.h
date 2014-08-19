@@ -32,10 +32,70 @@ typedef enum _ActionState {
 	kActionStateHide,
 } ActionState;
 
+enum GameRunState
+{
+	GRS_UNKNOWN,
+	GRS_PAUSE,
+	GRS_PLAY,
+	GRS_TOUCH_OVER,
+	GRS_FINISH_ANSWER,
+	GRS_LEVELUP,
+	GRS_OVER
+};
+
+enum NUM
+{
+	CARD_COUNT = 6,//µÀ¾ßÊý
+	CARD_INFO = 99,
+	BTN_CARD = 100,
+
+	BTN_CLOSE = 200,
+	BTN_SURE,
+	BTN_CANCLE,
+	BTN_BUY,
+
+	LabelAtlas_SCORE,
+	LabelAtlas_TIME,
+	LabelAtlas_COIN,
+	LabelAtlas_PRICE,
+
+	TAG_QUESTION_TITLE = 800,
+	TAG_QUESTION_ANS,
+	TAG_RIGHT_ANS,
+	TAG_WRONG_ANS,
+	TAG_CARD_BUY,
+
+	TAG_DARK_BG = 900,
+	TAG_COUNTDOWN,
+	TAG_MENU,
+};
+
 // 4 - structures
 typedef struct _BoundingBox {
 	cocos2d::CCRect actual;
 	cocos2d::CCRect original;
 } BoundingBox;
+
+struct ImageData
+{
+	const char *m_strPath;
+	CCPoint m_Position;
+};
+
+struct LabelAtlasData
+{
+	const char *charMapFile;
+	int itemWidth;
+	int itemHeight;
+	int startCharMap;
+	CCPoint m_Position;
+};
+
+struct MenuItemData
+{
+	const char *charMapFile;
+	const char *charMapFilePress;
+	CCPoint m_Position;
+};
 
 #endif

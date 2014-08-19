@@ -1,11 +1,10 @@
-#include "GameScene.h"
+#include "GameControl.h"
 
 USING_NS_CC;
 
 GameScene::GameScene()
 {
 }
-
 
 GameScene::~GameScene()
 {
@@ -19,6 +18,7 @@ bool GameScene::init()
 	do 
 	{
 		CC_BREAK_IF(!CCScene::init());
+		
 		_hudLayer = HudLayer::create();
 		this->addChild(_hudLayer, 0);
 		_gameLayer = GameLayer::create();
@@ -33,6 +33,9 @@ bool GameScene::init()
 
 void GameScene::update(float delta)
 {
-	_hudLayer->update(delta);
-	_gameLayer->update(delta);
+	if (g_Control.gameState != GRS_OVER)
+	{
+		_hudLayer->update(delta);
+		_gameLayer->update(delta);
+	}
 }

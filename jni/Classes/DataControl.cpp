@@ -3,7 +3,7 @@
 DataControl::DataControl()
 {
 	csvFile = new CSVReader();
-	csvFile->openFile("snail.bin");
+	csvFile->openFile("snail.csv");
 }
 
 DataControl::~DataControl()
@@ -21,11 +21,12 @@ void DataControl::initQuestion(int level)
 	replaceString(question, word, "?");
 
 	options.clear();
-	for (int i = COL_OPTION1; i < COL_OPTION4; i++)
+	for (int i = COL_OPTION1; i <= COL_OPTION4; i++)
 	{
 		string opt = csvFile->getData(row, i);
-		if (opt.length() > 0)
+		if (opt.length() > 1)
 		{
+			CCLog("_____options______%s____", opt.c_str());
 			options.push_back(opt);
 		}
 	}

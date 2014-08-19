@@ -14,7 +14,6 @@ isShowAnswerAfterWrong(false)
 
 GameLayer::~GameLayer()
 {
-	delete dataControl;
 }
 
 bool GameLayer::init()
@@ -23,16 +22,21 @@ bool GameLayer::init()
 	do 
 	{
 		CC_BREAK_IF(!CCLayer::init());
+		g_Control.playBGMusic(s_musicBgGame);
+
 		initTitle();
 		this->initHero();
 		this->setTouchEnabled(true);
 
 		countDown(0);
+		dataControl = g_Control.dataControl;
 
-		dataControl = new DataControl();
 		monsters = CCArray::createWithCapacity(4);
 		monsters->retain();
 		isInit = true;
+
+		g_Control.playEffect(s_effectCountDown);
+		g_Control.gameState = GRS_UNKNOWN;
 	} while (0);
 
 	return isInit; 
@@ -60,7 +64,6 @@ void GameLayer::initMonster()
 	int i = 0;
 	for (set<int>::iterator it = types.begin(); it != types.end(); it++)
 	{
-		CCLog("___________type =  %d______", *it);
 		Monster *_monster = Monster::create();
 		_monster->setText(dataControl->options[i]);
 		if (i == dataControl->getRightOption())
@@ -85,7 +88,7 @@ void GameLayer::initMonster()
 
 bool GameLayer::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 {
-	if (gameState != GRS_PLAY)
+	if (g_Control.gameState != GRS_PLAY)
 	{
 		return false;
 	}
@@ -94,7 +97,7 @@ bool GameLayer::ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent)
 
 void GameLayer::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 {
-	if (gameState != GRS_PLAY)
+	if (g_Control.gameState != GRS_PLAY)
 	{
 		return;
 	}
@@ -115,7 +118,8 @@ void GameLayer::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
 	
 			if (sPointLabel.containsPoint(labelTouchPoint) || sPoint.containsPoint(touchPoint))
 			{
-				gameState = GRS_TOUCH_OVER;
+				g_Control.gameState = GRS_TOUCH_OVER;
+				g_Control.playEffect(s_effectAnswer);
 				setSpeedGain(_hero->getSpeedLevel());
 				
 				if (_monster->getRightAns())
@@ -190,6 +194,7 @@ void GameLayer::ansRight()
 	g_Control.m_nRight++;
 	if (_hero->changeSpeed(true))
 	{
+		g_Control.playEffect(s_effectUseItem);
 		setSpeedProgress(_hero->getSpeedLevel());
 	}
 
@@ -209,6 +214,7 @@ void GameLayer::ansWrong()
 	int speedLevel = _hero->getSpeedLevel();
 	if (_hero->changeSpeed(false))
 	{
+		g_Control.playEffect(s_effectAnswer);
 		speedLevel = _hero->getSpeedLevel();
 		setSpeedProgress(speedLevel);
 	}
@@ -299,7 +305,13 @@ void GameLayer::initTitle()
 
 void GameLayer::onPauseClick(CCObject *pSender)
 {
-	gameState = GRS_PAUSE;
+	if (g_Control.gameState == GRS_UNKNOWN)
+	{
+		return;
+	}
+
+	g_Control.gameState = GRS_PAUSE;
+	g_Control.playEffect(s_effectButton);
 
 	PopupLayer *popupLayer = PopupLayer::create(g_pExitTips[0]);
 	popupLayer->setCallbackFunc(this, callfuncN_selector(GameLayer::buttonCallback));
@@ -315,13 +327,14 @@ void GameLayer::onPauseClick(CCObject *pSender)
 
 void GameLayer::buttonCallback(CCNode *pNode)
 {
+	g_Control.playEffect(s_effectButton);
 	switch (pNode->getTag())
 	{
 	case BTN_SURE:
 		exitGame();	
 		break;
 	case BTN_CANCLE:
-		gameState = GRS_PLAY;
+		g_Control.gameState = GRS_PLAY;
 		this->removeChildByTag(TAG_DARK_BG);
 		break;
 	default:
@@ -355,7 +368,7 @@ void GameLayer::countDownDone()
 	static int nCount = 0;
 	this->removeChildByTag(TAG_COUNTDOWN);
 	nCount++;
-	if (nCount < 3)
+	if (nCount < 4)
 	{
 		countDown(nCount);
 	}
@@ -363,14 +376,14 @@ void GameLayer::countDownDone()
 	{
 		//g_OralCalculating.playBGMusic(OralCalculating::MIDBG_MUSIC_B1);
 		nCount = 0;
+		gameLevel = 1;
 
 		initQuestion();
 		this->initMonster();
 		this->initProgress();
 		initCards();
-		gameState = GRS_PLAY;
+		g_Control.gameState = GRS_PLAY;
 
-		gameLevel = 1;
 		g_Control.reset();
 		//开启定时器，延时2s执行，执行3+1次，执行间隔1s  
 		//this->schedule(schedule_selector(GameLayer::timeScheduler), 1, 3, 2);
@@ -391,7 +404,7 @@ void GameLayer::nextQuestion()
 	changeQuestion();
 	initMonster();
 
-	gameState = GRS_PLAY;
+	g_Control.gameState = GRS_PLAY;
 }
 
 void GameLayer::initCards()
@@ -424,6 +437,8 @@ void GameLayer::initCards()
 
 void GameLayer::onCardClick(CCObject *pSender)
 {
+	g_Control.playEffect(s_effectButton);
+
 	playSpeedUpAnim();
 	CCMenuItemImage *card = (CCMenuItemImage *)pSender;
 	int tag = card->getTag();
@@ -462,6 +477,8 @@ void GameLayer::onCardClick(CCObject *pSender)
 
 void GameLayer::playSpeedUpAnim()
 {
+	g_Control.playEffect(s_effectUseItem);
+
 	CCLayerColor *layer = CCLayerColor::create(ccc4(25, 25, 25, 125));
 	layer->setTag(TAG_DARK_BG);
 	this->addChild(layer, ORDER_POP);
@@ -495,8 +512,15 @@ void GameLayer::excludeAnswer()
 
 void GameLayer::noAnswerCard()
 {
-	runAction(CCSequence::create(CCDelayTime::create(2.0f), CCCallFunc::create(this, callfunc_selector(GameLayer::ansRight)), NULL));
+	//runAction(CCSequence::create(CCDelayTime::create(2.0f), CCCallFunc::create(this, callfunc_selector(GameLayer::ansRight)), NULL));
 	CCObject *pObj;
+
+	g_Control.gameState = GRS_TOUCH_OVER;
+	setSpeedGain(_hero->getSpeedLevel());
+
+	isAnsRight = true;
+	timeRemain = clampf(timeRemain + 8, 0, timeMax);
+
 	CCARRAY_FOREACH(monsters, pObj)
 	{
 		Monster *_mon = (Monster *)pObj;
@@ -537,7 +561,7 @@ void GameLayer::dobuleScoreCard()
 
 void GameLayer::update(float dt)
 {
-	bool isUpdate = gameState == GRS_PLAY || gameState == GRS_FINISH_ANSWER || gameState == GRS_TOUCH_OVER;
+	bool isUpdate = g_Control.gameState == GRS_PLAY || g_Control.gameState == GRS_FINISH_ANSWER || g_Control.gameState == GRS_TOUCH_OVER;
 	int size = monsters->count();
 	if (size == 0 || !isUpdate)
 	{
@@ -558,10 +582,12 @@ void GameLayer::update(float dt)
 		{
 			if (isAnsRight)
 			{
+				g_Control.playEffect(s_effectEat); 
 				_mon->actionTomatoEat(g_Control.getRoadVelocity() * dt);
 			}
 			else
 			{
+				g_Control.playEffect(s_effectHit);
 				_hero->hit();
 				_mon->actionHitToFar();
 				setSpeedGain(_hero->getSpeedLevel());
@@ -574,9 +600,9 @@ void GameLayer::update(float dt)
 		}
 	}
 
-	if (count == size && gameState != GRS_FINISH_ANSWER)
+	if (count == size && g_Control.gameState != GRS_FINISH_ANSWER)
 	{
-		gameState = GRS_FINISH_ANSWER;
+		g_Control.gameState = GRS_FINISH_ANSWER;
 		if (isAnsRight)
 		{
 			ansRight();
@@ -610,6 +636,17 @@ void GameLayer::updateTitle()
 	labelAtlas = (CCLabelAtlas *)getChildByTag(LabelAtlas_TIME);
 	sprintf(num, "%02d", (int)timeRemain);
 	labelAtlas->setString(num); 
+
+	static bool isTimeLess;
+	if (!isTimeLess && timeRemain<10 && timeRemain>0)
+	{
+		isTimeLess = true;
+		g_Control.playEffect(s_effectTimeLess);
+	}
+	else if(timeRemain >= 10)
+	{
+		isTimeLess = false;
+	}
 }
 
 bool GameLayer::isLevelUp()
@@ -632,19 +669,20 @@ bool GameLayer::isLevelUp()
 		count = LEVEL_FOUR;
 		break;
 	default:
-		count = LEVEL_ONE;
+		count = LEVEL_FOUR;
 		break;
 	}
 
 	if (g_Control.m_nRight >= count)
 	{
 		gameLevel++;
-		if (gameLevel == 3)
+		if (gameLevel >= 5)
 		{
 			gameOver(true);
 		}
 		else
 		{
+			g_Control.playEffect(s_effectLevelUp);
 			timeRemain = timeMax;
 			CCSprite *pcdSprite = CCSprite::create(s_pLevelUp);
 
@@ -672,20 +710,37 @@ void GameLayer::levelUpDone()
 
 void GameLayer::gameOver(bool isPassAll)
 {
+	g_Control.gameState = GRS_OVER;
+	removeChild(_hero);
+
+	CCSprite *pcdSprite = CCSprite::create(s_pBgGameOver);
+	pcdSprite->setPosition(CENTER);
+	addChild(pcdSprite, ORDER_POP);
+
 	if (isPassAll)
 	{
-		exitGame();
+		g_Control.playEffect(s_effectGamePass);
+		CCAnimation *animation = AnimationUtils::createAnimationWithSpriteFrames(s_pGamePass);
+		CCFiniteTimeAction *actionOne = CCSequence::create(
+			CCAnimate::create(animation),
+			CCCallFunc::create(this, callfunc_selector(GameLayer::exitGame)),
+			NULL
+			);
+
+		PopupLayer *pop = PopupLayer::playAnimation("pass/game_pass_00.png", CENTER, actionOne);
+		pcdSprite->addChild(pop);
 	}
 	else
 	{
-		CCSprite *pcdSprite = CCSprite::create(s_pGameOver);
+		g_Control.playEffect(s_effectGameOver);
+		pcdSprite = CCSprite::create(s_pGameOver);
 
-		pcdSprite->setPosition(CENTER);
+		pcdSprite->setPosition(ccp(640, 1000));
 		pcdSprite->setOpacity(128);
-		this->addChild(pcdSprite, ORDER_COUNT_DOWN, TAG_COUNTDOWN);
+		this->addChild(pcdSprite, ORDER_POP);
 
-		pcdSprite->runAction(CCSequence::create(CCSpawn::create(CCScaleTo::create(0.2f, 1), CCFadeTo::create(0.2f, 255), NULL),
-			CCDelayTime::create(0.6f),
+		pcdSprite->runAction(CCSequence::create(CCSpawn::create(CCMoveTo::create(0.6f, CENTER), CCScaleTo::create(0.2f, 1), CCFadeTo::create(0.2f, 255), NULL),
+			CCDelayTime::create(1.5f),
 			CCSpawn::create(CCScaleTo::create(0.2f, 0), CCFadeTo::create(0.2f, 0), NULL),
 			CCCallFunc::create(this, callfunc_selector(GameLayer::exitGame)), NULL));
 	}

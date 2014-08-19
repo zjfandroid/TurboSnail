@@ -74,7 +74,8 @@ void HelpScene::initButton()
 
 void HelpScene::buttonCallback(CCNode *pNode)
 {
-	CCLog("          call back  = %d  ", pNode->getTag());
+	g_Control.playEffect(s_effectButton);
+
 	switch (pNode->getTag())
 	{
 	case BTN_START:

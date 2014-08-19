@@ -15,6 +15,7 @@ public:
 		BTN_START,
 		BTN_MARKET,
 		BTN_SOUND,
+		TAG_PROGRESS,
 	};
 
 public:
@@ -23,12 +24,19 @@ public:
 
 	virtual bool init();
 	CREATE_FUNC(StartScene);
+	void buttonCallback(CCNode *pNode);
 
-	virtual void update(float delta);
 	void initBackground();
 	void initButton();
-	void buttonCallback(CCNode *pNode);
 	void exit(void);
+	void initResources(float t);
+	void initProgress();
+	void loadComplete();
+	void updateProgress(int param1);
+
+private:
+	CCProgressTimer *progress;
+	bool isTouchEnable;
 };
 
 #endif
